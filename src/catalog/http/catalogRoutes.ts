@@ -1,10 +1,11 @@
 import { OpenAPIHono, createRoute } from '@hono/zod-openapi'
 import { z } from 'zod'
 
-import type { Catalog } from '#/catalog/domain/catalog.ts'
+import { searchProducts } from '#/catalog/application/searchProducts.ts'
+import type { CatalogRepositories } from '#/catalog/application/searchProducts.ts'
 import { CategoryTree } from '#/catalog/domain/categoryTree.ts'
 import { parseCriteria } from '#/catalog/domain/productCriteria.ts'
-import { emptyProductList, searchProducts } from '#/catalog/domain/productSearch.ts'
+import { emptyProductList } from '#/catalog/domain/productSearch.ts'
 import { negotiateFormat } from '#/shared/http/contentNegotiation.ts'
 import { problemContent, errorSchema } from '#/shared/http/problemSchemas.ts'
 import type { RouteOptions } from '#/shared/http/routeOptions.ts'
@@ -12,11 +13,6 @@ import { scenario } from '#/shared/http/scenario.ts'
 
 import { categoryNodeContract, productListContract } from './contract.ts'
 import { productQueryDocumentation, rawCriteriaFromQuery } from './productQuery.ts'
-
-export interface CatalogRepositories {
-  readonly categories: Catalog.CategoryRepository
-  readonly products: Catalog.ProductRepository
-}
 
 export const catalogRoutes = (repositories: CatalogRepositories, options: RouteOptions) =>
   new OpenAPIHono()
@@ -61,8 +57,7 @@ export const catalogRoutes = (repositories: CatalogRepositories, options: RouteO
       }),
       async (c) => {
         const criteria = parseCriteria(rawCriteriaFromQuery(new URL(c.req.url).search))
-        const categories = await repositories.categories.findAll()
 
-        return c.json(await searchProducts(criteria, categories, repositories.products), 200)
+        return c.json(await searchProducts(criteria, repositories), 200)
       },
     )

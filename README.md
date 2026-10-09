@@ -110,6 +110,7 @@ src/
   config.ts               variables d'environnement, validées par zod
   task/ blog/ contact/ catalog/
     domain/               types, port du dépôt, règles pures (aucune dépendance)
+    application/          catalogue seulement : cas d'utilisation searchProducts
     infrastructure/       schéma du document, adaptateur MongoDB, fixtures
     http/                 contract.ts (langage publié), routes createRoute, adaptation HTTP
   shared/

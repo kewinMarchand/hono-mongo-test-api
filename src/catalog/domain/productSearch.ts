@@ -1,6 +1,5 @@
 import { DEFAULT_ITEMS_PER_PAGE, EXPOSURES, SIZES } from './catalog.ts'
 import type { Catalog } from './catalog.ts'
-import { CategoryTree } from './categoryTree.ts'
 
 const facetValues = <TValue extends string>(
   values: readonly TValue[],
@@ -52,21 +51,3 @@ export const toSearchQuery = (
   skip: (criteria.page - 1) * criteria.itemsPerPage,
   limit: criteria.itemsPerPage,
 })
-
-/**
- * Filtre, tri, pagination et comptage disjonctif : le compteur d'une valeur de facette
- * applique tous les filtres actifs sauf ceux de sa propre facette. Une catégorie inconnue
- * lève CategoryNotFoundError.
- */
-export const searchProducts = async (
-  criteria: Catalog.Criteria,
-  categories: readonly Catalog.Category[],
-  products: Catalog.ProductRepository,
-): Promise<Catalog.ProductList> => {
-  const tree = CategoryTree.of(categories)
-  const current = criteria.category === null ? null : CategoryTree.find(tree, criteria.category)
-  const children = CategoryTree.childrenOf(tree, current)
-  const result = await products.search(toSearchQuery(criteria, children))
-
-  return toProductList(criteria, children, result)
-}
