@@ -6,6 +6,7 @@ import {
   isSize,
 } from './catalog.ts'
 import type { Catalog } from './catalog.ts'
+import { Price } from './price.ts'
 
 const DIGITS = /^\d+$/
 
@@ -14,6 +15,12 @@ const toInteger = (value: string | undefined): number | null =>
   value !== undefined && DIGITS.test(value)
     ? Math.min(Number(value), Number.MAX_SAFE_INTEGER)
     : null
+
+const toPrice = (value: string | undefined): Price | null => {
+  const cents = toInteger(value)
+
+  return cents === null ? null : Price.fromCents(cents)
+}
 
 const toSort = (raw: Catalog.RawCriteria): Catalog.Sort | null => {
   if (raw.orderPrice === 'asc' || raw.orderPrice === 'desc') {
@@ -34,8 +41,8 @@ export const parseCriteria = (raw: Catalog.RawCriteria): Catalog.Criteria => {
     category: raw.category === undefined || raw.category === '' ? null : raw.category,
     exposures: raw.exposure.filter(isExposure),
     sizes: raw.size.filter(isSize),
-    priceMin: toInteger(raw.priceMin),
-    priceMax: toInteger(raw.priceMax),
+    priceMin: toPrice(raw.priceMin),
+    priceMax: toPrice(raw.priceMax),
     inStockOnly: raw.inStock === 'true' || raw.inStock === '1',
     sort: toSort(raw),
     page: Math.min(MAX_PAGE, Math.max(1, toInteger(raw.page) ?? 1)),

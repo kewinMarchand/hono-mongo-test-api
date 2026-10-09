@@ -1,10 +1,13 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
-import type { Catalog } from '#/catalog/domain/catalog.ts'
+import type { z } from 'zod'
+
 import { productListContract } from '#/catalog/http/contract.ts'
 
 import { createTestContext, getJson } from './context.ts'
 import type { TestContext } from './context.ts'
+
+type ProductList = z.infer<typeof productListContract>
 
 let context: TestContext
 
@@ -13,20 +16,20 @@ beforeAll(async () => {
 })
 afterAll(() => context.close())
 
-const products = async (query: string): Promise<Catalog.ProductList> => {
+const products = async (query: string): Promise<ProductList> => {
   const { response, body } = await getJson(context, `/api/products?${query}`)
   expect(response.status).toBe(200)
 
   return productListContract.parse(body)
 }
 
-const counts = (facets: readonly Catalog.FacetValue[]) =>
+const counts = (facets: ProductList['facets']['exposure']) =>
   Object.fromEntries(facets.map(({ value, count }) => [value, count]))
 
-const categoryCounts = (list: Catalog.ProductList) =>
+const categoryCounts = (list: ProductList) =>
   Object.fromEntries(list.facets.category.map(({ slug, count }) => [slug, count]))
 
-const pagination = ({ totalItems, page, itemsPerPage, totalPages }: Catalog.ProductList) => ({
+const pagination = ({ totalItems, page, itemsPerPage, totalPages }: ProductList) => ({
   totalItems,
   page,
   itemsPerPage,

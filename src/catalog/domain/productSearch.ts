@@ -1,6 +1,6 @@
 import { DEFAULT_ITEMS_PER_PAGE, EXPOSURES, SIZES } from './catalog.ts'
 import type { Catalog } from './catalog.ts'
-import { childrenOf, findCategory } from './categoryTree.ts'
+import { CategoryTree } from './categoryTree.ts'
 
 const facetValues = <TValue extends string>(
   values: readonly TValue[],
@@ -63,8 +63,9 @@ export const searchProducts = async (
   categories: readonly Catalog.Category[],
   products: Catalog.ProductRepository,
 ): Promise<Catalog.ProductList> => {
-  const current = criteria.category === null ? null : findCategory(categories, criteria.category)
-  const children = childrenOf(categories, current?.slug ?? null)
+  const tree = CategoryTree.of(categories)
+  const current = criteria.category === null ? null : CategoryTree.find(tree, criteria.category)
+  const children = CategoryTree.childrenOf(tree, current)
   const result = await products.search(toSearchQuery(criteria, children))
 
   return toProductList(criteria, children, result)

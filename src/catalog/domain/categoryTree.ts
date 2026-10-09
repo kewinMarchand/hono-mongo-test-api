@@ -1,30 +1,20 @@
 import type { Catalog } from './catalog.ts'
 import { CategoryNotFoundError } from './CategoryNotFoundError.ts'
 
-export const childrenOf = (
-  categories: readonly Catalog.Category[],
-  parent: string | null,
-): Catalog.Category[] =>
-  categories
-    .filter((category) => category.parent === parent)
-    .toSorted((a, b) => a.position - b.position)
+/** L'arbre des catégories du catalogue, valeur immuable. La racine est représentée par null. */
+export interface CategoryTree {
+  readonly categories: readonly Catalog.Category[]
+}
 
-export const buildCategoryTree = (
-  categories: readonly Catalog.Category[],
-  parent: string | null = null,
-): Catalog.CategoryNode[] =>
-  childrenOf(categories, parent).map((category) => ({
-    slug: category.slug,
-    name: category.name,
-    parent: category.parent,
-    children: buildCategoryTree(categories, category.slug),
-  }))
+const byPosition = (a: Catalog.Category, b: Catalog.Category): number => a.position - b.position
 
-export const findCategory = (
-  categories: readonly Catalog.Category[],
-  slug: string,
-): Catalog.Category => {
-  const category = categories.find((candidate) => candidate.slug === slug)
+const childrenOf = (tree: CategoryTree, parent: Catalog.Category | null): Catalog.Category[] =>
+  tree.categories
+    .filter((category) => category.parent === (parent?.slug ?? null))
+    .toSorted(byPosition)
+
+const find = (tree: CategoryTree, slug: string): Catalog.Category => {
+  const category = tree.categories.find((candidate) => candidate.slug === slug)
   if (category === undefined) {
     throw new CategoryNotFoundError(slug)
   }
@@ -33,13 +23,34 @@ export const findCategory = (
 }
 
 /** Slugs de la racine jusqu'à la catégorie incluse : dénormalisé sur chaque produit. */
-export const categoryPath = (categories: readonly Catalog.Category[], slug: string): string[] => {
+const pathTo = (tree: CategoryTree, slug: string): string[] => {
   const path: string[] = []
   for (let current: string | null = slug; current !== null;) {
-    const category = findCategory(categories, current)
+    const category = find(tree, current)
     path.unshift(category.slug)
     current = category.parent
   }
 
   return path
+}
+
+const toNodes = (
+  tree: CategoryTree,
+  parent: Catalog.Category | null = null,
+): Catalog.CategoryNode[] =>
+  childrenOf(tree, parent).map((category) => ({
+    slug: category.slug,
+    name: category.name,
+    parent: category.parent,
+    children: toNodes(tree, category),
+  }))
+
+export const CategoryTree = {
+  of: (categories: readonly Catalog.Category[]): CategoryTree => ({
+    categories: Object.freeze(categories.toSorted(byPosition)),
+  }),
+  find,
+  childrenOf,
+  pathTo,
+  toNodes,
 }

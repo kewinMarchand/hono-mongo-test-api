@@ -1,59 +1,59 @@
 import { describe, expect, it } from 'vitest'
 
 import { CategoryNotFoundError } from '#/catalog/domain/CategoryNotFoundError.ts'
-import {
-  buildCategoryTree,
-  categoryPath,
-  childrenOf,
-  findCategory,
-} from '#/catalog/domain/categoryTree.ts'
+import { CategoryTree } from '#/catalog/domain/categoryTree.ts'
 import { emptyProductList, toProductList, toSearchQuery } from '#/catalog/domain/productSearch.ts'
 import { parseCriteria } from '#/catalog/domain/productCriteria.ts'
 import { rawCriteriaFromQuery } from '#/catalog/http/productQuery.ts'
 import { categoryFixtures } from '#/catalog/infrastructure/catalogFixtures.ts'
 
+const tree = CategoryTree.of(categoryFixtures)
+
 describe('arbre des catégories', () => {
   it('construit 3 racines et 14 catégories', () => {
-    const tree = buildCategoryTree(categoryFixtures)
-    expect(tree.map((node) => node.slug)).toEqual([
+    const nodes = CategoryTree.toNodes(tree)
+    expect(nodes.map((node) => node.slug)).toEqual([
       'plantes-interieur',
       'plantes-exterieur',
       'plantes-aquatiques',
     ])
-    expect(tree[0]?.children[0]?.children.map((node) => node.slug)).toEqual([
+    expect(nodes[0]?.children[0]?.children.map((node) => node.slug)).toEqual([
       'monstera',
       'fougeres',
     ])
   })
 
   it('liste les enfants directs triés par position', () => {
-    expect(childrenOf(categoryFixtures, 'feuillages').map((category) => category.slug)).toEqual([
-      'monstera',
-      'fougeres',
-    ])
-    expect(childrenOf(categoryFixtures, 'monstera')).toEqual([])
+    expect(
+      CategoryTree.childrenOf(tree, CategoryTree.find(tree, 'feuillages')).map(
+        (category) => category.slug,
+      ),
+    ).toEqual(['monstera', 'fougeres'])
+    expect(CategoryTree.childrenOf(tree, CategoryTree.find(tree, 'monstera'))).toEqual([])
   })
 
   it('calcule le chemin depuis la racine', () => {
-    expect(categoryPath(categoryFixtures, 'monstera')).toEqual([
+    expect(CategoryTree.pathTo(tree, 'monstera')).toEqual([
       'plantes-interieur',
       'feuillages',
       'monstera',
     ])
   })
 
+  it('liste les racines pour le parent null', () => {
+    expect(CategoryTree.childrenOf(tree, null)).toHaveLength(3)
+  })
+
   it('lève CategoryNotFoundError avec le message français', () => {
-    expect(() => findCategory(categoryFixtures, 'cactus')).toThrow(
-      new CategoryNotFoundError('cactus'),
-    )
-    expect(() => findCategory(categoryFixtures, 'cactus')).toThrow('Catégorie introuvable : cactus')
+    expect(() => CategoryTree.find(tree, 'cactus')).toThrow(new CategoryNotFoundError('cactus'))
+    expect(() => CategoryTree.find(tree, 'cactus')).toThrow('Catégorie introuvable : cactus')
   })
 })
 
 describe('liste de produits', () => {
   it('complète les facettes à 0 dans un ordre fixe et compte les pages', () => {
     const criteria = parseCriteria(rawCriteriaFromQuery('category=feuillages&itemsPerPage=5'))
-    const children = childrenOf(categoryFixtures, 'feuillages')
+    const children = CategoryTree.childrenOf(tree, CategoryTree.find(tree, 'feuillages'))
     const list = toProductList(criteria, children, {
       items: [],
       totalItems: 6,

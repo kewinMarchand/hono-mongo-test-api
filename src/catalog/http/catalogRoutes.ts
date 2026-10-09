@@ -2,7 +2,7 @@ import { OpenAPIHono, createRoute } from '@hono/zod-openapi'
 import { z } from 'zod'
 
 import type { Catalog } from '#/catalog/domain/catalog.ts'
-import { buildCategoryTree } from '#/catalog/domain/categoryTree.ts'
+import { CategoryTree } from '#/catalog/domain/categoryTree.ts'
 import { parseCriteria } from '#/catalog/domain/productCriteria.ts'
 import { emptyProductList, searchProducts } from '#/catalog/domain/productSearch.ts'
 import { negotiateFormat } from '#/shared/http/contentNegotiation.ts'
@@ -37,7 +37,8 @@ export const catalogRoutes = (repositories: CatalogRepositories, options: RouteO
           },
         },
       }),
-      async (c) => c.json(buildCategoryTree(await repositories.categories.findAll()), 200),
+      async (c) =>
+        c.json(CategoryTree.toNodes(CategoryTree.of(await repositories.categories.findAll())), 200),
     )
     .openapi(
       createRoute({

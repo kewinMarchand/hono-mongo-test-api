@@ -1,4 +1,5 @@
 import type { Catalog } from '#/catalog/domain/catalog.ts'
+import { Price } from '#/catalog/domain/price.ts'
 
 type CategoryRow = readonly [slug: string, name: string, parent: string | null]
 
@@ -159,7 +160,7 @@ export const productFixtures: Catalog.Product[] = PRODUCTS.map(
     slug,
     name,
     categorySlug,
-    price,
+    price: Price.fromCents(price),
     exposure,
     size,
     inStock,

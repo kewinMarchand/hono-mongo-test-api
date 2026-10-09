@@ -3,6 +3,7 @@ import { z } from 'zod'
 
 import { EXPOSURES, SIZES } from '#/catalog/domain/catalog.ts'
 import type { Catalog } from '#/catalog/domain/catalog.ts'
+import { Price } from '#/catalog/domain/price.ts'
 import type { CollectionDefinition } from '#/shared/infrastructure/mongo.ts'
 
 const categoryDocumentSchema = z.object({
@@ -86,9 +87,10 @@ const countBy = (field: string): Document[] => [
   { $group: { _id: `$${field}`, count: { $sum: 1 } } },
 ]
 
-const toProduct = ({ _id, categoryPath, ...product }: ProductDocument): Catalog.Product => ({
+const toProduct = ({ _id, categoryPath, price, ...product }: ProductDocument): Catalog.Product => ({
   id: _id,
   ...product,
+  price: Price.fromCents(price),
 })
 
 /**

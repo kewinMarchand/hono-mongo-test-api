@@ -6,7 +6,7 @@ import {
   articleFixtures,
   MongoArticleRepository,
 } from '#/blog/infrastructure/mongoArticle.ts'
-import { categoryPath } from '#/catalog/domain/categoryTree.ts'
+import { CategoryTree } from '#/catalog/domain/categoryTree.ts'
 import { categoryFixtures, productFixtures } from '#/catalog/infrastructure/catalogFixtures.ts'
 import {
   categoryCollection,
@@ -59,11 +59,12 @@ export const resetDatabase = async (db: Db): Promise<void> => {
   await typedCollection(db, categoryCollection).insertMany(
     categoryFixtures.map(({ slug, ...category }) => ({ _id: slug, ...category })),
   )
+  const tree = CategoryTree.of(categoryFixtures)
   await typedCollection(db, productCollection).insertMany(
     productFixtures.map(({ id, ...product }) => ({
       _id: id,
       ...product,
-      categoryPath: categoryPath(categoryFixtures, product.categorySlug),
+      categoryPath: CategoryTree.pathTo(tree, product.categorySlug),
     })),
   )
 }

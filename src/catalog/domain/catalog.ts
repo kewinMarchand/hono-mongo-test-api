@@ -1,3 +1,5 @@
+import type { Price } from './price.ts'
+
 export const EXPOSURES = ['soleil', 'mi-ombre', 'ombre'] as const
 export const SIZES = ['S', 'M', 'L'] as const
 export const DEFAULT_ITEMS_PER_PAGE = 12
@@ -36,8 +38,7 @@ export declare namespace Catalog {
     readonly slug: string
     readonly name: string
     readonly categorySlug: string
-    /** Prix en centimes. */
-    readonly price: number
+    readonly price: Price
     readonly exposure: Exposure
     readonly size: Size
     readonly inStock: boolean
@@ -91,8 +92,8 @@ export declare namespace Catalog {
     readonly category: string | null
     readonly exposures: readonly Exposure[]
     readonly sizes: readonly Size[]
-    readonly priceMin: number | null
-    readonly priceMax: number | null
+    readonly priceMin: Price | null
+    readonly priceMax: Price | null
     readonly inStockOnly: boolean
     readonly sort: Sort | null
     readonly page: number
@@ -105,8 +106,8 @@ export declare namespace Catalog {
     readonly children: readonly string[]
     readonly exposures: readonly Exposure[]
     readonly sizes: readonly Size[]
-    readonly priceMin: number | null
-    readonly priceMax: number | null
+    readonly priceMin: Price | null
+    readonly priceMax: Price | null
     readonly inStockOnly: boolean
     readonly sort: Sort | null
     readonly skip: number
