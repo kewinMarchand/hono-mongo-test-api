@@ -44,17 +44,18 @@ Le projet Compose s'appelle `hono-mongo-test-api` : ses conteneurs, son réseau 
 
 `make help` liste tout. Les principales :
 
-| Commande                                                     | Effet                                                                          |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------ |
-| `make install`                                               | Image, `yarn install` dans le conteneur, hooks Husky, conteneurs               |
-| `make up` / `make down`                                      | Lance ou arrête les conteneurs (la base est conservée)                         |
-| `make db-reset`                                              | Recrée la base : validateurs `$jsonSchema`, index, mêmes fixtures que Doctrine |
-| `make qa`                                                    | Lint, format, types, contrôle de `openapi.json`, tests                         |
-| `make lint` / `make format` / `make typecheck` / `make test` | Chaque étape seule                                                             |
-| `make openapi`                                               | Exporte le schéma OpenAPI dans `openapi.json`                                  |
-| `make contract`                                              | Compare cette API à l'API Platform, les deux lancées (voir plus bas)           |
-| `make logs` / `make sh` / `make mongo-sh`                    | Journaux, shell dans l'API, mongosh sur la base de dev                         |
-| `make docker-build-prod`                                     | Image de production (`hono-mongo-test-api:prod`)                               |
+| Commande                                                     | Effet                                                                                                     |
+| ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| `make install`                                               | Image, `yarn install` dans le conteneur, hooks Husky, conteneurs                                          |
+| `make up` / `make down`                                      | Lance ou arrête les conteneurs (la base est conservée)                                                    |
+| `make db-reset`                                              | Recrée la base : validateurs `$jsonSchema`, index, mêmes fixtures que Doctrine                            |
+| `make qa`                                                    | Lint (dont règles d'architecture), auto-test des règles, format, types, contrôle de `openapi.json`, tests |
+| `make arch-selftest`                                         | Écrit six violations volontaires des règles d'architecture, exige l'échec d'ESLint, puis les retire       |
+| `make lint` / `make format` / `make typecheck` / `make test` | Chaque étape seule                                                                                        |
+| `make openapi`                                               | Exporte le schéma OpenAPI dans `openapi.json`                                                             |
+| `make contract`                                              | Compare cette API à l'API Platform, les deux lancées (voir plus bas)                                      |
+| `make logs` / `make sh` / `make mongo-sh`                    | Journaux, shell dans l'API, mongosh sur la base de dev                                                    |
+| `make docker-build-prod`                                     | Image de production (`hono-mongo-test-api:prod`)                                                          |
 
 ## Basculer un front d'une API à l'autre
 
@@ -106,6 +107,7 @@ Le domaine et le langage publié sont séparés. Le domaine porte le modèle, le
 ```
 src/
   app.ts                  composition : routes, CORS, erreurs, documentation, AppType
+  database.ts             composition : dépôts MongoDB, schéma, remise à zéro avec les fixtures
   server.ts               connexion MongoDB, schéma, serveur
   config.ts               variables d'environnement, validées par zod
   task/ blog/ contact/ catalog/
@@ -121,7 +123,11 @@ tests/
   unit/                   règles pures
   integration/            HTTP via app.request contre un MongoDB réel
 contract/                 comparaison automatique avec l'API Platform
+tools/archSelftest.ts     auto-test des règles d'architecture
+eslint.architecture.mjs   règles de dépendance entre modules et couches
 ```
+
+Règles de dépendance, vérifiées par ESLint : le domaine n'importe que son propre domaine (ni zod, ni Hono, ni MongoDB), l'application que le domaine de son module, `http/` ni l'infrastructure ni un autre module, l'infrastructure ni `http/` ni un autre module, `shared/` aucun module. Tout import interne passe par `#/`, un chemin relatif qui remonte (`../`) est refusé.
 
 Le catalogue calcule filtre, tri, pagination et compteurs disjonctifs en **une agrégation** : `$match` sur la branche (`categoryPath`), puis `$facet` avec la page, le total et un compteur par facette, chacun avec ses propres filtres. Les catégories (14 documents) sont lues à part pour résoudre la branche, renvoyer 404 et nommer les sous-catégories.
 

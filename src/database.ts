@@ -25,7 +25,7 @@ import {
   taskFixtures,
 } from '#/task/infrastructure/mongoTask.ts'
 
-import { ensureCollections, typedCollection } from './mongo.ts'
+import { ensureCollections, typedCollection } from '#/shared/infrastructure/mongo.ts'
 
 const COLLECTIONS = [
   taskCollection,

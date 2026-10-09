@@ -1,7 +1,10 @@
-qa: lint format-check typecheck openapi-check test ## QA complète : lint, format, types, OpenAPI à jour, tests
+qa: lint arch-selftest format-check typecheck openapi-check test ## QA complète : lint (dont architecture), auto-test des règles, format, types, OpenAPI à jour, tests
 
-lint: ## ESLint (typescript-eslint strict, avec les types)
+lint: ## ESLint (typescript-eslint strict, avec les types, et règles d'architecture)
 	$(YARN) lint
+
+arch-selftest: ## Écrit des violations volontaires des règles d'architecture, exige l'échec d'ESLint, puis les retire
+	$(EXEC) node tools/archSelftest.ts
 
 format: ## Prettier (écriture)
 	$(YARN) format
@@ -19,4 +22,4 @@ openapi-check: ## Vérifie que openapi.json correspond au schéma servi
 test: ## Tests unitaires et d'intégration HTTP (Vitest, MongoDB de test)
 	$(YARN) test
 
-.PHONY: qa lint format format-check typecheck openapi-check test
+.PHONY: qa lint arch-selftest format format-check typecheck openapi-check test

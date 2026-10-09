@@ -2,7 +2,7 @@ import { serve } from '@hono/node-server'
 
 import { createApp } from '#/app.ts'
 import { loadConfig } from '#/config.ts'
-import { createRepositories, ensureSchema } from '#/shared/infrastructure/database.ts'
+import { createRepositories, ensureSchema } from '#/database.ts'
 import { connectMongo } from '#/shared/infrastructure/mongo.ts'
 
 const config = loadConfig()

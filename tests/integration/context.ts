@@ -3,7 +3,7 @@ import type { Db, MongoClient } from 'mongodb'
 import { createApp } from '#/app.ts'
 import type { AppConfig } from '#/app.ts'
 import { loadConfig } from '#/config.ts'
-import { createRepositories, resetDatabase } from '#/shared/infrastructure/database.ts'
+import { createRepositories, resetDatabase } from '#/database.ts'
 import { connectMongo } from '#/shared/infrastructure/mongo.ts'
 
 export interface TestContext {

@@ -1,5 +1,5 @@
 import { loadConfig } from '#/config.ts'
-import { resetDatabase } from '#/shared/infrastructure/database.ts'
+import { resetDatabase } from '#/database.ts'
 import { connectMongo } from '#/shared/infrastructure/mongo.ts'
 
 const config = loadConfig()

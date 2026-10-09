@@ -20,5 +20,5 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src", "tests", "contract", "*.ts", "*.mjs"]
+  "include": ["src", "tests", "contract", "tools", "*.ts", "*.mjs"]
 }

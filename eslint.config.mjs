@@ -2,6 +2,8 @@ import js from '@eslint/js'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
+import { architecture } from './eslint.architecture.mjs'
+
 export default tseslint.config(
   { ignores: ['node_modules/**', 'coverage/**', 'contract/reports/**'] },
   js.configs.recommended,
@@ -20,6 +22,7 @@ export default tseslint.config(
       'no-console': ['error', { allow: ['warn', 'error', 'info'] }],
     },
   },
+  ...architecture,
   {
     files: ['**/*.mjs'],
     ...tseslint.configs.disableTypeChecked,
