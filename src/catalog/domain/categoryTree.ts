@@ -1,4 +1,4 @@
-import type { Catalog } from './Catalog.ts'
+import type { Catalog } from './catalog.ts'
 import { CategoryNotFoundError } from './CategoryNotFoundError.ts'
 
 export const childrenOf = (

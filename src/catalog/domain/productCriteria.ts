@@ -2,10 +2,10 @@ import {
   DEFAULT_ITEMS_PER_PAGE,
   MAX_ITEMS_PER_PAGE,
   MAX_PAGE,
-  exposureSchema,
-  sizeSchema,
-} from './Catalog.ts'
-import type { Catalog } from './Catalog.ts'
+  isExposure,
+  isSize,
+} from './catalog.ts'
+import type { Catalog } from './catalog.ts'
 
 const DIGITS = /^\d+$/
 
@@ -32,14 +32,8 @@ export const parseCriteria = (raw: Catalog.RawCriteria): Catalog.Criteria => {
 
   return {
     category: raw.category === undefined || raw.category === '' ? null : raw.category,
-    exposures: raw.exposure.flatMap((value) => {
-      const parsed = exposureSchema.safeParse(value)
-      return parsed.success ? [parsed.data] : []
-    }),
-    sizes: raw.size.flatMap((value) => {
-      const parsed = sizeSchema.safeParse(value)
-      return parsed.success ? [parsed.data] : []
-    }),
+    exposures: raw.exposure.filter(isExposure),
+    sizes: raw.size.filter(isSize),
     priceMin: toInteger(raw.priceMin),
     priceMax: toInteger(raw.priceMax),
     inStockOnly: raw.inStock === 'true' || raw.inStock === '1',

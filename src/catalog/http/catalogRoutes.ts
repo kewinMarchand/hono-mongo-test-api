@@ -1,8 +1,7 @@
 import { OpenAPIHono, createRoute } from '@hono/zod-openapi'
 import { z } from 'zod'
 
-import { categoryNodeSchema, productListSchema } from '#/catalog/domain/Catalog.ts'
-import type { Catalog } from '#/catalog/domain/Catalog.ts'
+import type { Catalog } from '#/catalog/domain/catalog.ts'
 import { buildCategoryTree } from '#/catalog/domain/categoryTree.ts'
 import { parseCriteria } from '#/catalog/domain/productCriteria.ts'
 import { emptyProductList, searchProducts } from '#/catalog/domain/productSearch.ts'
@@ -11,6 +10,7 @@ import { problemContent, errorSchema } from '#/shared/http/problemSchemas.ts'
 import type { RouteOptions } from '#/shared/http/routeOptions.ts'
 import { scenario } from '#/shared/http/scenario.ts'
 
+import { categoryNodeContract, productListContract } from './contract.ts'
 import { productQueryDocumentation, rawCriteriaFromQuery } from './productQuery.ts'
 
 export interface CatalogRepositories {
@@ -33,7 +33,7 @@ export const catalogRoutes = (repositories: CatalogRepositories, options: RouteO
         responses: {
           200: {
             description: 'Category collection',
-            content: { 'application/json': { schema: z.array(categoryNodeSchema) } },
+            content: { 'application/json': { schema: z.array(categoryNodeContract) } },
           },
         },
       }),
@@ -53,7 +53,7 @@ export const catalogRoutes = (repositories: CatalogRepositories, options: RouteO
         responses: {
           200: {
             description: 'ProductList resource',
-            content: { 'application/json': { schema: productListSchema } },
+            content: { 'application/json': { schema: productListContract } },
           },
           404: { description: 'Not found', content: problemContent(errorSchema) },
         },

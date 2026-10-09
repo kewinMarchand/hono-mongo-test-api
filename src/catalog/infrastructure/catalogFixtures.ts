@@ -1,4 +1,4 @@
-import type { Catalog } from '#/catalog/domain/Catalog.ts'
+import type { Catalog } from '#/catalog/domain/catalog.ts'
 
 type CategoryRow = readonly [slug: string, name: string, parent: string | null]
 

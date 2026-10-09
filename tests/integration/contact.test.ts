@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
-import { CONTACT_ERRORS, contactMessageSchema } from '#/contact/domain/ContactMessage.ts'
+import { CONTACT_ERRORS, contactMessageContract } from '#/contact/http/contract.ts'
 import { constraintViolationSchema } from '#/shared/http/problemSchemas.ts'
 
 import { createTestContext } from './context.ts'
@@ -29,7 +29,7 @@ describe('POST /api/contact_messages', () => {
         message: 'Bonjour, je souhaite un devis pour une refonte.',
       }),
     )
-    const { receivedAt, ...saved } = contactMessageSchema.parse(await response.json())
+    const { receivedAt, ...saved } = contactMessageContract.parse(await response.json())
 
     expect(response.status).toBe(201)
     expect(response.headers.get('location')).toBe('/api/contact_messages/1')

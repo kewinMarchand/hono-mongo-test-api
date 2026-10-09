@@ -4,8 +4,9 @@ import { z } from 'zod'
 import { negotiateFormat } from '#/shared/http/contentNegotiation.ts'
 import type { RouteOptions } from '#/shared/http/routeOptions.ts'
 import { scenario } from '#/shared/http/scenario.ts'
-import { taskSchema } from '#/task/domain/Task.ts'
 import type { Task } from '#/task/domain/Task.ts'
+
+import { taskContract } from './contract.ts'
 
 export const taskRoutes = (repository: Task.Repository, options: RouteOptions) =>
   new OpenAPIHono().openapi(
@@ -20,7 +21,7 @@ export const taskRoutes = (repository: Task.Repository, options: RouteOptions) =
       responses: {
         200: {
           description: 'Task collection',
-          content: { 'application/json': { schema: z.array(taskSchema) } },
+          content: { 'application/json': { schema: z.array(taskContract) } },
         },
       },
     }),

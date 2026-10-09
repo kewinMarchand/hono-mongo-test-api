@@ -93,12 +93,13 @@ if (response.status === 200) {
 
 ## Typage de bout en bout
 
-Une seule source de vérité par domaine, le schéma zod de `src/<domaine>/domain/` :
+Le domaine et le langage publié sont séparés. Le domaine porte le modèle, le contrat (`src/<module>/http/contract.ts`) porte tout ce qui doit rester identique à l'API Platform :
 
-1. **Domaine** : `taskSchema`, `articleSchema`, `contactMessageSchema`, `productListSchema`… Les types en dérivent par `z.infer`, regroupés en namespaces (`Task.Entity`, `Catalog.ProductList`, `ContactMessage.Violation`). `.meta({ id })` nomme le composant OpenAPI sans que le domaine dépende de Hono.
-2. **MongoDB** : chaque adaptateur déclare le schéma zod de son document (`_id`, dates en `Date`, `categoryPath` dénormalisé). `Collection<z.infer<…>>` type les requêtes, et `toBsonSchema` (`src/shared/infrastructure/bsonSchema.ts`) traduit le même schéma en validateur `$jsonSchema` appliqué à la création de la collection : MongoDB refuse un document qui ne le respecte pas.
-3. **HTTP et OpenAPI** : les routes sont déclarées par `createRoute` avec ces schémas. La validation d'entrée, le type des réponses et `openapi.json` en sortent.
-4. **Client** : `AppType` porte les types des routes jusqu'à `hc`.
+1. **Domaine** (`src/<module>/domain/`) : types en namespaces (`Task.Entity`, `Catalog.ProductList`, `ContactMessage.Violation`), constantes et règles pures, sans zod, Hono ni MongoDB. Les règles renvoient des violations neutres (`{ field: 'email', kind: 'invalidFormat' }`).
+2. **Contrat** (`src/<module>/http/contract.ts`) : schémas zod nommés par `.meta({ id })` (composants OpenAPI), messages exacts, codes de contrainte Symfony, `phpTrim`. Il traduit les violations du domaine en `violations[]` de l'API Platform. Le compilateur vérifie qu'une réponse du domaine est assignable au type du contrat.
+3. **MongoDB** : chaque adaptateur déclare le schéma zod de son document (`_id`, dates en `Date`, `categoryPath` dénormalisé). `Collection<z.infer<…>>` type les requêtes, et `toBsonSchema` (`src/shared/infrastructure/bsonSchema.ts`) traduit le même schéma en validateur `$jsonSchema` appliqué à la création de la collection : MongoDB refuse un document qui ne le respecte pas.
+4. **HTTP et OpenAPI** : les routes sont déclarées par `createRoute` avec les schémas du contrat. La validation d'entrée, le type des réponses et `openapi.json` en sortent.
+5. **Client** : `AppType` porte les types des routes jusqu'à `hc`.
 
 ## Architecture
 
@@ -108,9 +109,9 @@ src/
   server.ts               connexion MongoDB, schéma, serveur
   config.ts               variables d'environnement, validées par zod
   task/ blog/ contact/ catalog/
-    domain/               schémas zod, types, port du dépôt, règles pures
+    domain/               types, port du dépôt, règles pures (aucune dépendance)
     infrastructure/       schéma du document, adaptateur MongoDB, fixtures
-    http/                 routes createRoute, adaptation HTTP
+    http/                 contract.ts (langage publié), routes createRoute, adaptation HTTP
   shared/
     http/                 négociation, problem+json, X-Scenario, CORS, query string PHP
     infrastructure/       connexion, création des collections, zod vers $jsonSchema

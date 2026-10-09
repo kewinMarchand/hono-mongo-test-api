@@ -1,5 +1,5 @@
-import { DEFAULT_ITEMS_PER_PAGE, EXPOSURES, SIZES } from './Catalog.ts'
-import type { Catalog } from './Catalog.ts'
+import { DEFAULT_ITEMS_PER_PAGE, EXPOSURES, SIZES } from './catalog.ts'
+import type { Catalog } from './catalog.ts'
 import { childrenOf, findCategory } from './categoryTree.ts'
 
 const facetValues = <TValue extends string>(

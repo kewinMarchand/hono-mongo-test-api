@@ -1,15 +1,7 @@
 import { OpenAPIHono, createRoute } from '@hono/zod-openapi'
 import { bodyLimit } from 'hono/body-limit'
 
-import {
-  contactMessageSchema,
-  contactMessageViolations,
-  contactMessageWriteSchema,
-  toDraft,
-  violationsFromIssues,
-} from '#/contact/domain/ContactMessage.ts'
 import type { ContactMessage } from '#/contact/domain/ContactMessage.ts'
-import { ContactMessageValidationError } from '#/contact/domain/ContactMessageValidationError.ts'
 import { negotiateFormat, requireJsonContentType } from '#/shared/http/contentNegotiation.ts'
 import { DeserializationError, PayloadTooLargeError } from '#/shared/http/httpErrors.ts'
 import {
@@ -20,6 +12,15 @@ import {
 import type { RouteOptions } from '#/shared/http/routeOptions.ts'
 import { scenario } from '#/shared/http/scenario.ts'
 
+import { ContactMessageValidationError } from './ContactMessageValidationError.ts'
+import {
+  contactMessageContract,
+  contactMessageWriteContract,
+  contactViolations,
+  toDraft,
+  violationsFromIssues,
+} from './contract.ts'
+import type { ContactMessageOutput } from './contract.ts'
 import { deserializeContactMessage } from './deserializeContactMessage.ts'
 
 /** Large au-dessus du plus gros corps valide (5000 caractères de message, 4 octets au plus chacun). */
@@ -35,7 +36,7 @@ const limitBody = bodyLimit({
 /** Date-heure ISO à la seconde avec décalage explicite, comme le DateTimeNormalizer de Symfony. */
 const toIsoSeconds = (date: Date): string => date.toISOString().replace(/\.\d{3}Z$/, '+00:00')
 
-const toOutput = (message: ContactMessage.Entity): ContactMessage.Output => ({
+const toOutput = (message: ContactMessage.Entity): ContactMessageOutput => ({
   id: message.id,
   name: message.name,
   email: message.email,
@@ -66,13 +67,13 @@ export const contactMessageRoutes = (
         body: {
           required: true,
           description: 'The new ContactMessage resource',
-          content: { 'application/json': { schema: contactMessageWriteSchema } },
+          content: { 'application/json': { schema: contactMessageWriteContract } },
         },
       },
       responses: {
         201: {
           description: 'ContactMessage resource created',
-          content: { 'application/json': { schema: contactMessageSchema } },
+          content: { 'application/json': { schema: contactMessageContract } },
         },
         400: { description: 'Invalid input', content: problemContent(errorSchema) },
         413: { description: 'Payload too large', content: problemContent(errorSchema) },
@@ -96,7 +97,7 @@ export const contactMessageRoutes = (
         const { issues } = result.error
         // Un tableau JSON est désérialisé par PHP comme un objet sans aucun des champs attendus.
         if (issues.every((issue) => issue.path.length === 0)) {
-          throw new ContactMessageValidationError(contactMessageViolations({}))
+          throw new ContactMessageValidationError(contactViolations({}))
         }
         const violations = violationsFromIssues(issues)
         if (violations === null) {

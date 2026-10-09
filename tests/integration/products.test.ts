@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
-import type { Catalog } from '#/catalog/domain/Catalog.ts'
-import { productListSchema } from '#/catalog/domain/Catalog.ts'
+import type { Catalog } from '#/catalog/domain/catalog.ts'
+import { productListContract } from '#/catalog/http/contract.ts'
 
 import { createTestContext, getJson } from './context.ts'
 import type { TestContext } from './context.ts'
@@ -17,7 +17,7 @@ const products = async (query: string): Promise<Catalog.ProductList> => {
   const { response, body } = await getJson(context, `/api/products?${query}`)
   expect(response.status).toBe(200)
 
-  return productListSchema.parse(body)
+  return productListContract.parse(body)
 }
 
 const counts = (facets: readonly Catalog.FacetValue[]) =>

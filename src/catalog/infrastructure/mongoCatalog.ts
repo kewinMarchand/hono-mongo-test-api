@@ -1,8 +1,8 @@
 import type { Collection, Document, Filter, Sort } from 'mongodb'
 import { z } from 'zod'
 
-import { exposureSchema, sizeSchema } from '#/catalog/domain/Catalog.ts'
-import type { Catalog } from '#/catalog/domain/Catalog.ts'
+import { EXPOSURES, SIZES } from '#/catalog/domain/catalog.ts'
+import type { Catalog } from '#/catalog/domain/catalog.ts'
 import type { CollectionDefinition } from '#/shared/infrastructure/mongo.ts'
 
 const categoryDocumentSchema = z.object({
@@ -19,8 +19,8 @@ const productDocumentSchema = z.object({
   categorySlug: z.string().min(1),
   categoryPath: z.array(z.string()).min(1),
   price: z.int().min(0),
-  exposure: exposureSchema,
-  size: sizeSchema,
+  exposure: z.enum(EXPOSURES),
+  size: z.enum(SIZES),
   inStock: z.boolean(),
   image: z.int().min(1).max(12),
 })

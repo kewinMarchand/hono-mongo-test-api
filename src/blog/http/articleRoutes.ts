@@ -1,11 +1,12 @@
 import { OpenAPIHono, createRoute } from '@hono/zod-openapi'
 import { z } from 'zod'
 
-import { articleSchema } from '#/blog/domain/Article.ts'
 import type { Article } from '#/blog/domain/Article.ts'
 import { negotiateFormat } from '#/shared/http/contentNegotiation.ts'
 import type { RouteOptions } from '#/shared/http/routeOptions.ts'
 import { scenario } from '#/shared/http/scenario.ts'
+
+import { articleContract } from './contract.ts'
 
 export const articleRoutes = (repository: Article.Repository, options: RouteOptions) =>
   new OpenAPIHono().openapi(
@@ -20,7 +21,7 @@ export const articleRoutes = (repository: Article.Repository, options: RouteOpti
       responses: {
         200: {
           description: 'Article collection',
-          content: { 'application/json': { schema: z.array(articleSchema) } },
+          content: { 'application/json': { schema: z.array(articleContract) } },
         },
       },
     }),

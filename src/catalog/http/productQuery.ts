@@ -5,8 +5,8 @@ import {
   EXPOSURES,
   MAX_ITEMS_PER_PAGE,
   SIZES,
-} from '#/catalog/domain/Catalog.ts'
-import type { Catalog } from '#/catalog/domain/Catalog.ts'
+} from '#/catalog/domain/catalog.ts'
+import type { Catalog } from '#/catalog/domain/catalog.ts'
 import { parsePhpQuery, readPhpParameter } from '#/shared/http/phpQuery.ts'
 import type { PhpValue } from '#/shared/http/phpQuery.ts'
 

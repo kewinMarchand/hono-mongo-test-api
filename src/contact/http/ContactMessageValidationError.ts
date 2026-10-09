@@ -1,9 +1,9 @@
-import type { ContactMessage } from './ContactMessage.ts'
+import type { ContactViolation } from './contract.ts'
 
 export class ContactMessageValidationError extends Error {
-  readonly violations: readonly ContactMessage.Violation[]
+  readonly violations: readonly ContactViolation[]
 
-  constructor(violations: readonly ContactMessage.Violation[]) {
+  constructor(violations: readonly ContactViolation[]) {
     super(
       violations.map((violation) => `${violation.propertyPath}: ${violation.message}`).join('\n'),
     )
