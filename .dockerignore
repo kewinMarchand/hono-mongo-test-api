@@ -1,0 +1,9 @@
+node_modules
+.git
+.github
+.husky
+.env
+.env.local
+coverage
+contract
+tests

@@ -1,0 +1,60 @@
+{
+  "name": "hono-mongo-test-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "API de test NoSQL (Hono, zod, MongoDB), interchangeable avec api-platform-test-api",
+  "license": "MIT",
+  "type": "module",
+  "imports": {
+    "#/*": "./src/*"
+  },
+  "scripts": {
+    "dev": "node --watch src/server.ts",
+    "start": "node src/server.ts",
+    "db:reset": "node src/scripts/dbReset.ts",
+    "openapi": "node src/scripts/exportOpenapi.ts openapi.json",
+    "contract": "node contract/compare.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepare": "husky || true"
+  },
+  "packageManager": "yarn@1.22.22",
+  "engines": {
+    "node": ">=24.14.0"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml,mjs}": [
+      "prettier --write"
+    ]
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.1.4",
+    "@hono/swagger-ui": "^0.6.1",
+    "@hono/zod-openapi": "^1.6.3",
+    "hono": "^4.13.13",
+    "mongodb": "^7.7.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9",
+    "@types/node": "^24",
+    "eslint": "^9",
+    "globals": "^17.13.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.9.9",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.71.1",
+    "vite": "^8",
+    "vitest": "^5.0.3"
+  }
+}

@@ -1,0 +1,21 @@
+import { writeFile } from 'node:fs/promises'
+
+import { createApp } from '#/app.ts'
+import type { AppDependencies } from '#/app.ts'
+import { openApiDocument } from '#/shared/http/openapiDocument.ts'
+
+const unavailable = (): Promise<never> =>
+  Promise.reject(new Error("L'export OpenAPI n'accède pas à la base."))
+
+const offline: AppDependencies = {
+  tasks: { findAll: unavailable },
+  articles: { findLatestFirst: unavailable },
+  contactMessages: { save: unavailable },
+  categories: { findAll: unavailable },
+  products: { search: unavailable },
+}
+
+const output = process.argv[2] ?? 'openapi.json'
+const app = createApp(offline, { APP_ENV: 'prod', CORS_ALLOW_ORIGIN: '^$' })
+await writeFile(output, `${JSON.stringify(openApiDocument(app), null, 4)}\n`)
+console.info(`Schéma OpenAPI exporté dans ${output}`)

@@ -1,0 +1,44 @@
+name: hono-mongo-test-api
+
+services:
+  api:
+    build:
+      context: .
+      target: dev
+    image: hono-mongo-test-api:dev
+    user: '${HOST_UID:-1000}:${HOST_GID:-1000}'
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      MONGODB_URI: mongodb://app:app@mongo:27017/?authSource=admin
+      MONGODB_DB: app
+    depends_on:
+      mongo:
+        condition: service_healthy
+    volumes:
+      - ./:/app
+    ports:
+      - '127.0.0.1:${API_PORT:-8091}:8080'
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '-O', '/dev/null', 'http://127.0.0.1:8080/api/tasks']
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+
+  mongo:
+    image: mongo:8.2
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: app
+      MONGO_INITDB_ROOT_PASSWORD: app
+    healthcheck:
+      test: ['CMD', 'mongosh', '--quiet', '--eval', "db.adminCommand('ping').ok"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
