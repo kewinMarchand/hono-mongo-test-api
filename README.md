@@ -169,6 +169,70 @@ Non comparés, mais à connaître :
 
 `.github/workflows/ci.yml` lance MongoDB 8.2 en service, installe Node depuis `.nvmrc`, puis `make qa EXEC=` (les commandes tournent sur le runner, sans Docker Compose) et construit l'image de production.
 
+## Démarrer un projet à partir de ce dépôt
+
+Le dépôt est marqué « template » sur GitHub.
+
+### Créer le dépôt
+
+Pour un nouveau projet, la voie recommandée est le bouton « Use this template » de GitHub, ou en ligne de commande :
+
+```sh
+gh repo create mon-projet --template kewinMarchand/hono-mongo-test-api --private --clone
+```
+
+Le nouveau dépôt part d'un historique vierge, sans lien avec l'original : un seul commit initial, aucun commit d'origine, et GitHub n'en garde que la mention « generated from ».
+
+Pour suivre les évolutions de ce dépôt ou y contribuer, la voie est le fork, qui garde l'historique et le lien avec l'original :
+
+```sh
+gh repo fork kewinMarchand/hono-mongo-test-api --clone
+```
+
+### Récupérer les mises à jour plus tard
+
+Dans le nouveau projet, ajouter ce dépôt comme source amont puis le lire :
+
+```sh
+git remote add upstream https://github.com/kewinMarchand/hono-mongo-test-api.git
+git fetch upstream
+```
+
+- **Projet issu d'un fork** : les historiques sont liés, `git merge upstream/main` suffit.
+- **Projet issu du template** : les historiques n'ont aucun commit commun et `git merge upstream/main` est refusé (« refusing to merge unrelated histories »). Reprendre les commits utiles un par un avec `git cherry-pick <commit>`, après les avoir repérés avec `git log upstream/main`. `git merge --allow-unrelated-histories` passe, mais chaque fichier présent des deux côtés avec un contenu différent devient un conflit, même un fichier que le projet n'a jamais touché.
+
+### Ce qu'il faut personnaliser
+
+| Sujet                              | Où                                                                                                                                                           | Quoi                                                                                                                                                                                |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Nom du paquet                      | `package.json`                                                                                                                                               | `name`, `description`                                                                                                                                                               |
+| Nom du projet Docker et des images | `compose.yaml` (`name`, `image`), `Makefile` (`docker-build-prod`)                                                                                           | `hono-mongo-test-api` donne aussi le nom du réseau et du volume `hono-mongo-test-api_mongo_data`                                                                                    |
+| Port publié                        | `compose.yaml`, `.env.example` (`API_PORT`), textes d'aide du `Makefile`, ce README                                                                          | 8091 sur `127.0.0.1`. Le conteneur écoute sur 8080 (`PORT`)                                                                                                                         |
+| Variables d'environnement          | `src/config.ts` (valeurs par défaut, validées par zod), `.env.example`                                                                                       | `APP_ENV`, `PORT`, `MONGODB_URI`, `MONGODB_DB`, `CORS_ALLOW_ORIGIN` (origines des fronts autorisées)                                                                                |
+| Base MongoDB                       | `compose.yaml` (`mongo:8.2`, identifiants `app`/`app`), `MONGODB_DB` (`app`), `vitest.config.ts` (`app_test`), service `mongo` de `.github/workflows/ci.yml` | Garder `mongo:8.2` tant que le noyau de la machine est en 6.19 ou plus (voir `CLAUDE.md`)                                                                                           |
+| Scénarios `X-Scenario`             | `src/shared/http/scenario.ts`, le middleware `scenario(…)` de chaque route                                                                                   | Actifs en dev et en test, sans effet quand `APP_ENV=prod`. À retirer d'une route qui n'en a pas besoin                                                                              |
+| Contrat OpenAPI                    | `src/shared/http/openapiDocument.ts` (titre, description, version), `http/contract.ts` de chaque module                                                      | `make openapi` régénère `openapi.json`, `make qa` échoue s'il n'est plus à jour                                                                                                     |
+| Parité avec l'API Platform         | `contract/`, `make contract`, `src/shared/http/phpQuery.ts`, `src/contact/http/deserializeContactMessage.ts`, les codes Symfony des `contract.ts`            | Ne sert que si le projet doit rester interchangeable avec une API Platform. Sinon, retirer `contract/`, la cible `contract` du `Makefile` et le script `contract` de `package.json` |
+| Intégration continue               | `.github/workflows/ci.yml`                                                                                                                                   | Image du service MongoDB, nom de l'image construite                                                                                                                                 |
+| Licence et documentation           | `LICENSE`, `README.md`, `CLAUDE.md`                                                                                                                          | Titulaire, description du projet                                                                                                                                                    |
+
+### Retirer les modules d'exemple
+
+Les quatre modules (`task`, `blog`, `contact`, `catalog`) sont des exemples. Pour en retirer un, noté `<module>` :
+
+1. **Dossier** : supprimer `src/<module>/`.
+2. **Routes et erreurs** (`src/app.ts`) : ses imports, son champ dans `AppDependencies`, son `.route('/', …Routes(…))`, son entrée dans `NOT_EXPOSED_ITEMS` (`/api/tasks/:id`, `/api/articles/:id`, `/api/contact_messages/:id`, `/api/categories/:slug`). Pour `catalog`, la ligne `CategoryNotFoundError` de `statusOf`. Pour `contact`, la branche `ContactMessageValidationError` de `onError`.
+3. **Base et données de départ** (`src/database.ts`) : ses imports, ses collections dans `COLLECTIONS` (`counters` part avec `contact`), son dépôt dans `createRepositories`, ses `insertMany` dans `resetDatabase`. Puis `make db-reset` : la base est supprimée et recréée sans ses collections.
+4. **Export OpenAPI** (`src/scripts/exportOpenapi.ts`) : son entrée dans `offline`. Puis `make openapi`.
+5. **Règles d'architecture** : retirer le module de `MODULES` dans `eslint.architecture.mjs`. Dans `tools/archSelftest.ts`, chaque violation dont le fichier ou l'import vise le module retiré doit être déplacée vers un module gardé, sans en retirer aucune : les six règles doivent rester couvertes. Sont concernés `blog` (« module vers autre module »), `contact` (« domaine vers http par chemin relatif ») et `catalog` (quatre violations). Il faut garder au moins un module pour que l'auto-test ait où écrire.
+6. **Tests** :
+   - `contact` : `tests/unit/contactMessage.test.ts`, `tests/integration/contact.test.ts`.
+   - `catalog` : `tests/unit/catalog.test.ts`, `price.test.ts`, `productCriteria.test.ts`, `searchProducts.test.ts`, `tests/integration/products.test.ts`, et le bloc `GET /api/categories` de `tests/integration/resources.test.ts`.
+   - `task` et `blog` n'ont pas de fichier propre, mais `resources.test.ts`, `scenarioAndCors.test.ts` et `typedClient.test.ts` passent par `/api/tasks` et `/api/articles` : leurs cas sont à supprimer ou à pointer vers une route gardée.
+7. **Contrat** : si `make contract` est conservé, retirer les cas du module dans `contract/cases.ts` et ses schémas de `COMPARED_SCHEMAS` dans `contract/openapi.ts`.
+
+Puis `make qa`. Vérifié en retirant `task` et `blog` : types et lint passent hors `typedClient.test.ts`, `make arch-selftest` reste vert après le déplacement d'une violation vers `contact`, et 13 tests à repointer échouent, tous dans les trois fichiers transverses cités.
+
 ## Licence
 
 MIT
