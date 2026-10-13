@@ -26,6 +26,8 @@ import { openApiDocument } from '#/shared/http/openapiDocument.ts'
 import { errorFlavor, problemBody, violationsBody } from '#/shared/http/problem.ts'
 import { routingErrorResponse } from '#/shared/http/routingErrors.ts'
 import { SimulatedServerError, scenario } from '#/shared/http/scenario.ts'
+import { NO_ERROR_REPORTING } from '#/shared/infrastructure/errorReporting.ts'
+import type { ErrorReporter } from '#/shared/infrastructure/errorReporting.ts'
 import type { Task } from '#/task/domain/Task.ts'
 import { taskRoutes } from '#/task/http/taskRoutes.ts'
 
@@ -65,12 +67,25 @@ const statusOf = (error: unknown): ContentfulStatusCode => {
   return 500
 }
 
+/**
+ * Erreurs attendues, ni journalisées ni envoyées à GlitchTip : toutes les 4xx, les 500 simulées
+ * par X-Scenario et les erreurs de désérialisation (corps invalide, 500 par parité avec
+ * l'API Platform mais causées par le client).
+ */
 const isExpected = (error: unknown): boolean =>
   error instanceof SimulatedServerError ||
   error instanceof DeserializationError ||
   statusOf(error) < 500
 
-export const createApp = (dependencies: AppDependencies, config: AppConfig) => {
+/**
+ * `reporter` (GlitchTip) ne reçoit que les erreurs inattendues : les routes inconnues (404, 405)
+ * ne passent pas par onError, la 422 de validation est traitée avant, `isExpected` écarte le reste.
+ */
+export const createApp = (
+  dependencies: AppDependencies,
+  config: AppConfig,
+  reporter: ErrorReporter = NO_ERROR_REPORTING,
+) => {
   const options = { scenarios: config.APP_ENV !== 'prod' }
   const app = new OpenAPIHono()
 
@@ -114,6 +129,7 @@ export const createApp = (dependencies: AppDependencies, config: AppConfig) => {
     const status = statusOf(error)
     if (!isExpected(error)) {
       console.error(error)
+      reporter.capture(error, { method: c.req.method, path: c.req.path })
     }
     const detail =
       status >= 500 && config.APP_ENV === 'prod' ? 'Internal Server Error' : error.message

@@ -9,8 +9,22 @@ const configSchema = z.object({
   MONGODB_URI: z.string().min(1).default('mongodb://app:app@127.0.0.1:27017/?authSource=admin'),
   MONGODB_DB: z.string().min(1).default('app'),
   CORS_ALLOW_ORIGIN: z.string().min(1).default(DEFAULT_CORS_ALLOW_ORIGIN),
+  GLITCHTIP_DSN: z
+    .string()
+    .optional()
+    .transform((value) => (value === '' ? undefined : value)),
+  GLITCHTIP_ENVIRONMENT: z.string().optional(),
 })
 
-export type Config = z.infer<typeof configSchema>
+/** Sans GLITCHTIP_ENVIRONMENT, l'environnement remonté est celui de l'application (APP_ENV). */
+const withDefaults = configSchema.transform((config) => ({
+  ...config,
+  GLITCHTIP_ENVIRONMENT:
+    config.GLITCHTIP_ENVIRONMENT === undefined || config.GLITCHTIP_ENVIRONMENT === ''
+      ? config.APP_ENV
+      : config.GLITCHTIP_ENVIRONMENT,
+}))
 
-export const loadConfig = (env: NodeJS.ProcessEnv = process.env): Config => configSchema.parse(env)
+export type Config = z.infer<typeof withDefaults>
+
+export const loadConfig = (env: NodeJS.ProcessEnv = process.env): Config => withDefaults.parse(env)
