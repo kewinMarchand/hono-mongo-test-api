@@ -12,27 +12,8 @@ concurrency:
 jobs:
   qa:
     runs-on: ubuntu-latest
-    services:
-      mongo:
-        image: mongo:8.2
-        env:
-          MONGO_INITDB_ROOT_USERNAME: app
-          MONGO_INITDB_ROOT_PASSWORD: app
-        ports:
-          - 27017:27017
-        options: >-
-          --health-cmd "mongosh --quiet --eval 'db.adminCommand(\"ping\").ok'"
-          --health-interval 2s
-          --health-timeout 5s
-          --health-retries 30
-    env:
-      MONGODB_URI: mongodb://app:app@127.0.0.1:27017/?authSource=admin
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with:
-          node-version-file: .nvmrc
-          cache: yarn
-      - run: yarn install --frozen-lockfile
-      - run: make qa EXEC=
-      - run: docker build --target prod -t hono-mongo-test-api:prod .
+      - run: make install
+      - run: make qa
+      - run: make docker-build-prod

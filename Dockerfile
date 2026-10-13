@@ -7,6 +7,8 @@ EXPOSE 8080
 
 FROM base AS dev
 ENV APP_ENV=dev
+# git pour Husky (installation des hooks) et lint-staged, lancés dans ce conteneur.
+RUN apk add --no-cache git
 CMD ["node", "--watch", "src/server.ts"]
 
 FROM base AS prod-deps

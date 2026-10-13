@@ -22,7 +22,7 @@ Seconde API de test des boilerplates front, interchangeable avec `../api-platfor
 - **CORS** : réécrit à la main (`shared/http/cors.ts`) pour reproduire nelmio/cors-bundle, dont le préflight diffère du middleware `cors` de Hono (200 et non 204, en-têtes renvoyés à une origine refusée, 400 « Unauthorized header »). Regex insensible à la casse dans `CORS_ALLOW_ORIGIN`.
 - **X-Scenario** : middleware par route, désactivé quand `APP_ENV=prod`. Ordre identique à l'API Platform : 415, 406, puis scénario, puis lecture du corps.
 - **Tests d'intégration** : `app.request` contre un MongoDB réel (celui de Compose, ou le service de la CI), une base par fichier (`app_test_<nom>`) pour que les fichiers tournent en parallèle. Pas de mongodb-memory-server : il télécharge un binaire `mongod` à l'installation, d'une version qui ne serait pas celle de l'image, et le service Compose existe déjà.
-- **Docker** : MongoDB non publié sur l'hôte, API sur `127.0.0.1:8091`. Les commandes `make` passent par `docker compose exec -T api` (`EXEC=` en CI), sauf `make contract` qui tourne sur l'hôte pour joindre 8090 et 8091.
+- **Docker** : MongoDB non publié sur l'hôte, API sur `127.0.0.1:8091`. Seuls prérequis : Docker avec Compose, `make` et git (SPEC-COMMUNE, section 18). Les commandes de qualité passent par `docker compose exec -T api`, en local comme en CI. `make install` et `make lint-staged` utilisent un conteneur ponctuel (`run --rm --no-deps api`), pile lancée ou non. `make contract` passe par le service `contract` (profil `tools`, `network_mode: host`) pour joindre 8090 et 8091 depuis le conteneur. L'image de dev ajoute `git` à `node:24.14-alpine` pour Husky et lint-staged.
 
 ## Versions, et pourquoi
 
@@ -71,5 +71,5 @@ Seconde API de test des boilerplates front, interchangeable avec `../api-platfor
 - **415 avant 406** sur le `POST`, et `X-Scenario: error` avant la lecture du corps (un JSON invalide reçoit la 500 simulée).
 - **`fetch` ajoute `Accept: */*`** : le script de contrat passe par `node:http` pour maîtriser chaque en-tête (l'absence d'Accept change la forme des erreurs).
 - **`curl` et les crochets** : sans `-g`, curl interprète `[...]` comme un motif. Toujours `curl -g` pour tester les paramètres du catalogue.
-- **Husky dans le conteneur** : pas de `git` dans l'image, `husky` y échoue. `make install` installe les hooks depuis l'hôte, `prepare` est `husky || true`.
+- **Husky dans le conteneur** : `node:24.14-alpine` n'a pas `git`, et `husky` (script `prepare`, lancé par `yarn install`) échoue sans lui. L'étape `dev` du Dockerfile installe `git`. `prepare` reste `husky || true` pour l'image de production, installée avec `--ignore-scripts`.
 - **`c.json(body, status, { 'Content-Type': … })`** garde le Content-Type fourni : c'est ainsi que les erreurs sortent en `application/problem+json`.

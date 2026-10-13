@@ -25,9 +25,8 @@ Le détail du contrat (formats, paramètres du catalogue, règles du formulaire,
 
 ## Prérequis
 
-- Docker avec Compose v2.
+- Docker avec Compose v2, `make` et git. Rien d'autre : Node, Yarn, les outils de qualité et les hooks Git tournent dans le conteneur.
 - Le port 8091 libre sur `127.0.0.1`.
-- Node 24.14 (`.nvmrc`) et Yarn 1 sur la machine pour les hooks Git et `make contract`. Le reste tourne dans le conteneur.
 
 ## Démarrage
 
@@ -44,18 +43,19 @@ Le projet Compose s'appelle `hono-mongo-test-api` : ses conteneurs, son réseau 
 
 `make help` liste tout. Les principales :
 
-| Commande                                                     | Effet                                                                                                     |
-| ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
-| `make install`                                               | Image, `yarn install` dans le conteneur, hooks Husky, conteneurs                                          |
-| `make up` / `make down`                                      | Lance ou arrête les conteneurs (la base est conservée)                                                    |
-| `make db-reset`                                              | Recrée la base : validateurs `$jsonSchema`, index, mêmes fixtures que Doctrine                            |
-| `make qa`                                                    | Lint (dont règles d'architecture), auto-test des règles, format, types, contrôle de `openapi.json`, tests |
-| `make arch-selftest`                                         | Écrit six violations volontaires des règles d'architecture, exige l'échec d'ESLint, puis les retire       |
-| `make lint` / `make format` / `make typecheck` / `make test` | Chaque étape seule                                                                                        |
-| `make openapi`                                               | Exporte le schéma OpenAPI dans `openapi.json`                                                             |
-| `make contract`                                              | Compare cette API à l'API Platform, les deux lancées (voir plus bas)                                      |
-| `make logs` / `make sh` / `make mongo-sh`                    | Journaux, shell dans l'API, mongosh sur la base de dev                                                    |
-| `make docker-build-prod`                                     | Image de production (`hono-mongo-test-api:prod`)                                                          |
+| Commande                                                     | Effet                                                                                                                                                     |
+| ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `make install`                                               | Image, `yarn install` et hooks Husky dans le conteneur, conteneurs                                                                                        |
+| `make lint-staged`                                           | Lint et format des fichiers indexés, dans le conteneur (appelé par le hook pre-commit, qui s'arrête avec un message clair si Docker est absent ou arrêté) |
+| `make up` / `make down`                                      | Lance ou arrête les conteneurs (la base est conservée)                                                                                                    |
+| `make db-reset`                                              | Recrée la base : validateurs `$jsonSchema`, index, mêmes fixtures que Doctrine                                                                            |
+| `make qa`                                                    | Lint (dont règles d'architecture), auto-test des règles, format, types, contrôle de `openapi.json`, tests                                                 |
+| `make arch-selftest`                                         | Écrit six violations volontaires des règles d'architecture, exige l'échec d'ESLint, puis les retire                                                       |
+| `make lint` / `make format` / `make typecheck` / `make test` | Chaque étape seule                                                                                                                                        |
+| `make openapi`                                               | Exporte le schéma OpenAPI dans `openapi.json`                                                                                                             |
+| `make contract`                                              | Compare cette API à l'API Platform, les deux lancées (voir plus bas)                                                                                      |
+| `make logs` / `make sh` / `make mongo-sh`                    | Journaux, shell dans l'API, mongosh sur la base de dev                                                                                                    |
+| `make docker-build-prod`                                     | Image de production (`hono-mongo-test-api:prod`)                                                                                                          |
 
 ## Basculer un front d'une API à l'autre
 
@@ -171,7 +171,7 @@ Désactivé par défaut. Renseigner `GLITCHTIP_DSN` (DSN au format Sentry) dans 
 
 ## Intégration continue
 
-`.github/workflows/ci.yml` lance MongoDB 8.2 en service, installe Node depuis `.nvmrc`, puis `make qa EXEC=` (les commandes tournent sur le runner, sans Docker Compose) et construit l'image de production.
+`.github/workflows/ci.yml` n'appelle que des cibles `make`, donc les mêmes conteneurs que le poste de dev : `make install` (image, dépendances, MongoDB et API lancés), `make qa`, `make docker-build-prod`.
 
 ## Démarrer un projet à partir de ce dépôt
 
