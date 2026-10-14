@@ -13,6 +13,7 @@ import type { ContactMessage } from '#/contact/domain/ContactMessage.ts'
 import { ContactMessageValidationError } from '#/contact/http/ContactMessageValidationError.ts'
 import { contactMessageRoutes } from '#/contact/http/contactMessageRoutes.ts'
 import { negotiateFormat } from '#/shared/http/contentNegotiation.ts'
+import { contentSecurityPolicy } from '#/shared/http/contentSecurityPolicy.ts'
 import { cors } from '#/shared/http/cors.ts'
 import {
   DeserializationError,
@@ -89,6 +90,7 @@ export const createApp = (
   const options = { scenarios: config.APP_ENV !== 'prod' }
   const app = new OpenAPIHono()
 
+  app.use('*', contentSecurityPolicy())
   app.use('/api/*', cors(config.CORS_ALLOW_ORIGIN))
 
   const routes = app
