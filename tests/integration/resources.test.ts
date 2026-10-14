@@ -68,7 +68,7 @@ describe('GET /api/categories', () => {
     expect(body).toEqual([
       expect.objectContaining({
         slug: 'plantes-interieur',
-        name: "Plantes d'intérieur",
+        name: 'Plantes d’intérieur',
         parent: null,
       }),
       expect.objectContaining({ slug: 'plantes-exterieur', parent: null }),
