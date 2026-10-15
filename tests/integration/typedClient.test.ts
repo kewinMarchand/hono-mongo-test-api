@@ -1,10 +1,10 @@
 import { testClient } from 'hono/testing'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
-import type { Task } from '#/task/domain/Task.ts'
-
 import { createTestContext } from './context.ts'
+
 import type { TestContext } from './context.ts'
+import type { Task } from '#/task/domain/Task.ts'
 
 let context: TestContext
 

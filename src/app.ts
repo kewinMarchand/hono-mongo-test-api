@@ -1,17 +1,7 @@
 import { swaggerUI } from '@hono/swagger-ui'
 import { OpenAPIHono } from '@hono/zod-openapi'
 import { HTTPException } from 'hono/http-exception'
-import type { ContentfulStatusCode } from 'hono/utils/http-status'
 
-import type { Article } from '#/blog/domain/Article.ts'
-import { articleRoutes } from '#/blog/http/articleRoutes.ts'
-import { CategoryNotFoundError } from '#/catalog/domain/CategoryNotFoundError.ts'
-import { catalogRoutes } from '#/catalog/http/catalogRoutes.ts'
-import type { CatalogRepositories } from '#/catalog/application/searchProducts.ts'
-import type { Config } from '#/config.ts'
-import type { ContactMessage } from '#/contact/domain/ContactMessage.ts'
-import { ContactMessageValidationError } from '#/contact/http/ContactMessageValidationError.ts'
-import { contactMessageRoutes } from '#/contact/http/contactMessageRoutes.ts'
 import { negotiateFormat } from '#/shared/http/contentNegotiation.ts'
 import { contentSecurityPolicy } from '#/shared/http/contentSecurityPolicy.ts'
 import { cors } from '#/shared/http/cors.ts'
@@ -22,15 +12,27 @@ import {
   PayloadTooLargeError,
   UnsupportedMediaTypeError,
 } from '#/shared/http/httpErrors.ts'
-import { OPENAPI_MIME, PROBLEM_MIME, negotiate } from '#/shared/http/negotiation.ts'
+import { negotiate, OPENAPI_MIME, PROBLEM_MIME } from '#/shared/http/negotiation.ts'
 import { openApiDocument } from '#/shared/http/openapiDocument.ts'
 import { errorFlavor, problemBody, violationsBody } from '#/shared/http/problem.ts'
 import { routingErrorResponse } from '#/shared/http/routingErrors.ts'
-import { SimulatedServerError, scenario } from '#/shared/http/scenario.ts'
+import { scenario, SimulatedServerError } from '#/shared/http/scenario.ts'
 import { NO_ERROR_REPORTING } from '#/shared/infrastructure/errorReporting.ts'
+
+import { CategoryNotFoundError } from '#/catalog/domain/CategoryNotFoundError.ts'
+import { articleRoutes } from '#/blog/http/articleRoutes.ts'
+import { catalogRoutes } from '#/catalog/http/catalogRoutes.ts'
+import { contactMessageRoutes } from '#/contact/http/contactMessageRoutes.ts'
+import { ContactMessageValidationError } from '#/contact/http/ContactMessageValidationError.ts'
+import { taskRoutes } from '#/task/http/taskRoutes.ts'
+
+import type { Article } from '#/blog/domain/Article.ts'
+import type { CatalogRepositories } from '#/catalog/application/searchProducts.ts'
+import type { Config } from '#/config.ts'
+import type { ContactMessage } from '#/contact/domain/ContactMessage.ts'
 import type { ErrorReporter } from '#/shared/infrastructure/errorReporting.ts'
 import type { Task } from '#/task/domain/Task.ts'
-import { taskRoutes } from '#/task/http/taskRoutes.ts'
+import type { ContentfulStatusCode } from 'hono/utils/http-status'
 
 export interface AppDependencies extends CatalogRepositories {
   readonly tasks: Task.Repository

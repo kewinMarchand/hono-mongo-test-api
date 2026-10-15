@@ -1,12 +1,13 @@
 import {
   DEFAULT_ITEMS_PER_PAGE,
-  MAX_ITEMS_PER_PAGE,
-  MAX_PAGE,
   isExposure,
   isSize,
+  MAX_ITEMS_PER_PAGE,
+  MAX_PAGE,
 } from './catalog.ts'
-import type { Catalog } from './catalog.ts'
 import { Price } from './price.ts'
+
+import type { Catalog } from './catalog.ts'
 
 const DIGITS = /^\d+$/
 

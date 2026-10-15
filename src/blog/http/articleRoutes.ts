@@ -1,12 +1,13 @@
-import { OpenAPIHono, createRoute } from '@hono/zod-openapi'
+import { createRoute, OpenAPIHono } from '@hono/zod-openapi'
 import { z } from 'zod'
 
-import type { Article } from '#/blog/domain/Article.ts'
 import { negotiateFormat } from '#/shared/http/contentNegotiation.ts'
-import type { RouteOptions } from '#/shared/http/routeOptions.ts'
 import { scenario } from '#/shared/http/scenario.ts'
 
 import { articleContract } from './contract.ts'
+
+import type { Article } from '#/blog/domain/Article.ts'
+import type { RouteOptions } from '#/shared/http/routeOptions.ts'
 
 export const articleRoutes = (repository: Article.Repository, options: RouteOptions) =>
   new OpenAPIHono().openapi(

@@ -1,10 +1,11 @@
-import type { Db, MongoClient } from 'mongodb'
+import { connectMongo } from '#/shared/infrastructure/mongo.ts'
 
 import { createApp } from '#/app.ts'
-import type { AppConfig } from '#/app.ts'
 import { loadConfig } from '#/config.ts'
 import { createRepositories, resetDatabase } from '#/database.ts'
-import { connectMongo } from '#/shared/infrastructure/mongo.ts'
+
+import type { AppConfig } from '#/app.ts'
+import type { Db, MongoClient } from 'mongodb'
 
 export interface TestContext {
   readonly app: ReturnType<typeof createApp>

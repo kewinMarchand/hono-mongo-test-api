@@ -1,8 +1,10 @@
 import { writeFile } from 'node:fs/promises'
 
-import { createApp } from '#/app.ts'
-import type { AppDependencies } from '#/app.ts'
 import { openApiDocument } from '#/shared/http/openapiDocument.ts'
+
+import { createApp } from '#/app.ts'
+
+import type { AppDependencies } from '#/app.ts'
 
 const unavailable = (): Promise<never> =>
   Promise.reject(new Error("L'export OpenAPI n'accède pas à la base."))

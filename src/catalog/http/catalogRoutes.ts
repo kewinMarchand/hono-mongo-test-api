@@ -1,18 +1,20 @@
-import { OpenAPIHono, createRoute } from '@hono/zod-openapi'
+import { createRoute, OpenAPIHono } from '@hono/zod-openapi'
 import { z } from 'zod'
 
-import { searchProducts } from '#/catalog/application/searchProducts.ts'
-import type { CatalogRepositories } from '#/catalog/application/searchProducts.ts'
+import { negotiateFormat } from '#/shared/http/contentNegotiation.ts'
+import { errorSchema, problemContent } from '#/shared/http/problemSchemas.ts'
+import { scenario } from '#/shared/http/scenario.ts'
+
 import { CategoryTree } from '#/catalog/domain/categoryTree.ts'
 import { parseCriteria } from '#/catalog/domain/productCriteria.ts'
 import { emptyProductList } from '#/catalog/domain/productSearch.ts'
-import { negotiateFormat } from '#/shared/http/contentNegotiation.ts'
-import { problemContent, errorSchema } from '#/shared/http/problemSchemas.ts'
-import type { RouteOptions } from '#/shared/http/routeOptions.ts'
-import { scenario } from '#/shared/http/scenario.ts'
+import { searchProducts } from '#/catalog/application/searchProducts.ts'
 
 import { categoryNodeContract, productListContract } from './contract.ts'
 import { productQueryDocumentation, rawCriteriaFromQuery } from './productQuery.ts'
+
+import type { CatalogRepositories } from '#/catalog/application/searchProducts.ts'
+import type { RouteOptions } from '#/shared/http/routeOptions.ts'
 
 export const catalogRoutes = (repositories: CatalogRepositories, options: RouteOptions) =>
   new OpenAPIHono()

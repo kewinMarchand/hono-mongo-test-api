@@ -1,9 +1,11 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
-import { CONTACT_ERRORS, contactMessageContract } from '#/contact/http/contract.ts'
 import { constraintViolationSchema } from '#/shared/http/problemSchemas.ts'
 
+import { CONTACT_ERRORS, contactMessageContract } from '#/contact/http/contract.ts'
+
 import { createTestContext } from './context.ts'
+
 import type { TestContext } from './context.ts'
 
 let context: TestContext

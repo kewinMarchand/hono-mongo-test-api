@@ -1,6 +1,7 @@
+import { connectMongo } from '#/shared/infrastructure/mongo.ts'
+
 import { loadConfig } from '#/config.ts'
 import { resetDatabase } from '#/database.ts'
-import { connectMongo } from '#/shared/infrastructure/mongo.ts'
 
 const config = loadConfig()
 const client = await connectMongo(config.MONGODB_URI)

@@ -1,5 +1,6 @@
-import type { Catalog } from './catalog.ts'
 import { CategoryNotFoundError } from './CategoryNotFoundError.ts'
+
+import type { Catalog } from './catalog.ts'
 
 /** L'arbre des catégories du catalogue, valeur immuable. La racine est représentée par null. */
 export interface CategoryTree {

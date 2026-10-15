@@ -45,6 +45,7 @@ Seconde API de test des boilerplates front, interchangeable avec `../api-platfor
 - `vite` (dev) : dépendance pair de Vitest 5.
 - `@sentry/node` 11.6 : suivi des erreurs dans GlitchTip, imposé par la section 16 de SPEC-COMMUNE. Poids mesuré à l'installation : 27 paquets ajoutés, environ 85 Mo sur disque, surtout les instrumentations OpenTelemetry dont dépend le SDK (`@sentry/core` 8,5 Mo, `@sentry/node` 2,8 Mo). Aucun effet de bundle (serveur), effet sur l'image de production non mesuré. Le SDK n'est initialisé que si `GLITCHTIP_DSN` est renseigné, avec les seules intégrations utiles (exceptions et rejets non gérés, erreurs liées, dédoublonnage) : pas d'instrumentation HTTP, pas de trace.
 - `globals`, `@eslint/js`, `typescript-eslint` (dev) : configuration ESLint plate.
+- `eslint-plugin-simple-import-sort` 14 (dev, un seul paquet sans dépendance, aucun effet sur l'image) : ordre des imports, le même que dans les fronts.
 
 ## Règles d'architecture (D6, R13)
 
@@ -58,6 +59,7 @@ Seconde API de test des boilerplates front, interchangeable avec `../api-platfor
 - `@typescript-eslint/no-unused-vars` avec `ignoreRestSiblings: true` : retirer un champ d'un document par déstructuration (`{ _id, categoryPath, ...product }`) est l'écriture la plus lisible, la variable écartée est voulue.
 - `@typescript-eslint/consistent-type-assertions` en `never` : aucun `as` (hors `as const`), le narrowing passe par des gardes ou par zod. Une seule exception, désactivée sur sa ligne et commentée : la création du type marqué dans `Price.fromCents`, car une marque de compilation ne peut naître que d'une assertion.
 - `@typescript-eslint/no-namespace` avec `allowDeclarations` : namespaces de types uniquement (`declare namespace`).
+- `simple-import-sort/imports` et `simple-import-sort/exports` en erreur, corrigés par `yarn lint:fix` : ordre de standards-front adapté à l'API, tiers (`node:` et paquets), socle (`#/shared/`), modules dans l'ordre des couches `domain`, `application`, `infrastructure`, `http`, composition (`#/app.ts`, `#/config.ts`, `#/database.ts`), relatifs, types, effets de bord. Les motifs de couches excluent `#/shared/` : le plugin range un import sous le motif qui correspond sur la plus grande longueur, et `#/shared/domain/` partirait sinon chez les modules.
 - `no-console` autorise `info`, `warn`, `error` : journal de démarrage et scripts.
 
 ## Pièges rencontrés

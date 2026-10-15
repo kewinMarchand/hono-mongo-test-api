@@ -1,12 +1,11 @@
-import type { Db } from 'mongodb'
+import { ensureCollections, typedCollection } from '#/shared/infrastructure/mongo.ts'
 
-import type { AppDependencies } from '#/app.ts'
+import { CategoryTree } from '#/catalog/domain/categoryTree.ts'
 import {
   articleCollection,
   articleFixtures,
   MongoArticleRepository,
 } from '#/blog/infrastructure/mongoArticle.ts'
-import { CategoryTree } from '#/catalog/domain/categoryTree.ts'
 import { categoryFixtures, productFixtures } from '#/catalog/infrastructure/catalogFixtures.ts'
 import {
   categoryCollection,
@@ -25,7 +24,8 @@ import {
   taskFixtures,
 } from '#/task/infrastructure/mongoTask.ts'
 
-import { ensureCollections, typedCollection } from '#/shared/infrastructure/mongo.ts'
+import type { AppDependencies } from '#/app.ts'
+import type { Db } from 'mongodb'
 
 const COLLECTIONS = [
   taskCollection,

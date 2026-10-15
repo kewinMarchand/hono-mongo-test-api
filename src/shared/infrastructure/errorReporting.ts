@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/node'
+
 import type { ErrorEvent, NodeOptions } from '@sentry/node'
 
 export interface ErrorReporter {

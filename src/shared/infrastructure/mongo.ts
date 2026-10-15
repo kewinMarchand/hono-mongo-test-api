@@ -1,8 +1,9 @@
 import { MongoClient } from 'mongodb'
-import type { Collection, Db, IndexDescription } from 'mongodb'
-import type { z } from 'zod'
 
 import { toBsonSchema } from './bsonSchema.ts'
+
+import type { Collection, Db, IndexDescription } from 'mongodb'
+import type { z } from 'zod'
 
 export interface CollectionDefinition<TSchema extends z.ZodObject = z.ZodObject> {
   readonly name: string

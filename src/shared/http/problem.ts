@@ -1,4 +1,4 @@
-import { JSON_MIME, JSONLD_MIME, PROBLEM_MIME, negotiate } from './negotiation.ts'
+import { JSON_MIME, JSONLD_MIME, negotiate, PROBLEM_MIME } from './negotiation.ts'
 
 export type ErrorFlavor = 'plain' | 'jsonld'
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { RESOURCE_FORMATS, negotiate } from '#/shared/http/negotiation.ts'
+import { negotiate, RESOURCE_FORMATS } from '#/shared/http/negotiation.ts'
 import { errorFlavor } from '#/shared/http/problem.ts'
 
 describe('negotiate', () => {

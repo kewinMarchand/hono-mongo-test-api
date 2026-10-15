@@ -1,8 +1,8 @@
-import type { Collection } from 'mongodb'
 import { z } from 'zod'
 
 import type { CollectionDefinition } from '#/shared/infrastructure/mongo.ts'
 import type { Task } from '#/task/domain/Task.ts'
+import type { Collection } from 'mongodb'
 
 const taskDocumentSchema = z.object({
   _id: z.int().min(1),

@@ -1,10 +1,11 @@
 import { serve } from '@hono/node-server'
 
+import { initErrorReporting } from '#/shared/infrastructure/errorReporting.ts'
+import { connectMongo } from '#/shared/infrastructure/mongo.ts'
+
 import { createApp } from '#/app.ts'
 import { loadConfig } from '#/config.ts'
 import { createRepositories, ensureSchema } from '#/database.ts'
-import { initErrorReporting } from '#/shared/infrastructure/errorReporting.ts'
-import { connectMongo } from '#/shared/infrastructure/mongo.ts'
 
 const config = loadConfig()
 const reporter = initErrorReporting(config)

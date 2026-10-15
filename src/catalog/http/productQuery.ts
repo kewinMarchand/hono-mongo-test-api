@@ -1,13 +1,15 @@
 import { z } from 'zod'
 
+import { parsePhpQuery, readPhpParameter } from '#/shared/http/phpQuery.ts'
+
 import {
   DEFAULT_ITEMS_PER_PAGE,
   EXPOSURES,
   MAX_ITEMS_PER_PAGE,
   SIZES,
 } from '#/catalog/domain/catalog.ts'
+
 import type { Catalog } from '#/catalog/domain/catalog.ts'
-import { parsePhpQuery, readPhpParameter } from '#/shared/http/phpQuery.ts'
 import type { PhpValue } from '#/shared/http/phpQuery.ts'
 
 const scalar = (value: PhpValue | undefined): string | undefined =>

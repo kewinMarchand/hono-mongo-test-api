@@ -1,8 +1,8 @@
-import type { Collection } from 'mongodb'
 import { z } from 'zod'
 
 import type { ContactMessage } from '#/contact/domain/ContactMessage.ts'
 import type { CollectionDefinition } from '#/shared/infrastructure/mongo.ts'
+import type { Collection } from 'mongodb'
 
 const contactMessageDocumentSchema = z.object({
   _id: z.int().min(1),

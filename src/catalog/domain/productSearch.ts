@@ -1,4 +1,5 @@
 import { DEFAULT_ITEMS_PER_PAGE, EXPOSURES, SIZES } from './catalog.ts'
+
 import type { Catalog } from './catalog.ts'
 
 const facetValues = <TValue extends string>(

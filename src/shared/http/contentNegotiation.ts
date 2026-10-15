@@ -1,7 +1,7 @@
 import { createMiddleware } from 'hono/factory'
 
 import { NotAcceptableError, UnsupportedMediaTypeError } from './httpErrors.ts'
-import { RESOURCE_FORMATS, negotiate } from './negotiation.ts'
+import { negotiate, RESOURCE_FORMATS } from './negotiation.ts'
 
 /**
  * Comme API Platform : une requête sans Accept reçoit du JSON, un Accept sans correspondance

@@ -1,11 +1,11 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
-import type { z } from 'zod'
-
 import { productListContract } from '#/catalog/http/contract.ts'
 
 import { createTestContext, getJson } from './context.ts'
+
 import type { TestContext } from './context.ts'
+import type { z } from 'zod'
 
 type ProductList = z.infer<typeof productListContract>
 

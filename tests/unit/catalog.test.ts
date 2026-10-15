@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import { CategoryNotFoundError } from '#/catalog/domain/CategoryNotFoundError.ts'
 import { CategoryTree } from '#/catalog/domain/categoryTree.ts'
-import { emptyProductList, toProductList, toSearchQuery } from '#/catalog/domain/productSearch.ts'
 import { parseCriteria } from '#/catalog/domain/productCriteria.ts'
-import { rawCriteriaFromQuery } from '#/catalog/http/productQuery.ts'
+import { emptyProductList, toProductList, toSearchQuery } from '#/catalog/domain/productSearch.ts'
 import { categoryFixtures } from '#/catalog/infrastructure/catalogFixtures.ts'
+import { rawCriteriaFromQuery } from '#/catalog/http/productQuery.ts'
 
 const tree = CategoryTree.of(categoryFixtures)
 

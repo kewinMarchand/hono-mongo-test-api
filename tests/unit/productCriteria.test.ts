@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import type { Catalog } from '#/catalog/domain/catalog.ts'
 import { parseCriteria } from '#/catalog/domain/productCriteria.ts'
 import { rawCriteriaFromQuery } from '#/catalog/http/productQuery.ts'
+
+import type { Catalog } from '#/catalog/domain/catalog.ts'
 
 const NONE: Catalog.RawCriteria = {
   category: undefined,

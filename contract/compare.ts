@@ -1,11 +1,12 @@
 import { isDeepStrictEqual } from 'node:util'
 
 import { CASES } from './cases.ts'
-import type { ContractCase } from './cases.ts'
 import { send } from './http.ts'
-import type { RawResponse } from './http.ts'
 import { normalizeHeader, normalizeJson, parseJson } from './normalize.ts'
 import { openApiShape } from './openapi.ts'
+
+import type { ContractCase } from './cases.ts'
+import type { RawResponse } from './http.ts'
 
 const REFERENCE = process.env['CONTRACT_REFERENCE_URL'] ?? 'http://localhost:8090'
 const CANDIDATE = process.env['CONTRACT_CANDIDATE_URL'] ?? 'http://localhost:8091'

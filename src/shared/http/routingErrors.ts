@@ -1,6 +1,6 @@
-import type { Context } from 'hono'
-
 import { routingErrorBody } from './problem.ts'
+
+import type { Context } from 'hono'
 
 interface RegisteredRoute {
   readonly method: string

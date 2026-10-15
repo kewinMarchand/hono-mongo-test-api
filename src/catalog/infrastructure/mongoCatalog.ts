@@ -1,10 +1,11 @@
-import type { Collection, Document, Filter, Sort } from 'mongodb'
 import { z } from 'zod'
 
 import { EXPOSURES, SIZES } from '#/catalog/domain/catalog.ts'
-import type { Catalog } from '#/catalog/domain/catalog.ts'
 import { Price } from '#/catalog/domain/price.ts'
+
+import type { Catalog } from '#/catalog/domain/catalog.ts'
 import type { CollectionDefinition } from '#/shared/infrastructure/mongo.ts'
+import type { Collection, Document, Filter, Sort } from 'mongodb'
 
 const categoryDocumentSchema = z.object({
   _id: z.string().min(1),

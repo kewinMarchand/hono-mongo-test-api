@@ -1,6 +1,7 @@
-import type { Catalog } from '#/catalog/domain/catalog.ts'
 import { CategoryTree } from '#/catalog/domain/categoryTree.ts'
 import { toProductList, toSearchQuery } from '#/catalog/domain/productSearch.ts'
+
+import type { Catalog } from '#/catalog/domain/catalog.ts'
 
 export interface CatalogRepositories {
   readonly categories: Catalog.CategoryRepository

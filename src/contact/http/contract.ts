@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { CONTACT_LIMITS, contactMessageViolations } from '#/contact/domain/ContactMessage.ts'
+
 import type { ContactMessage } from '#/contact/domain/ContactMessage.ts'
 
 /** Messages exacts de l'API Platform (ContactMessageResource), à garder identiques au caractère près. */

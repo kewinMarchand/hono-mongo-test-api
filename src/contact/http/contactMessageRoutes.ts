@@ -1,7 +1,6 @@
-import { OpenAPIHono, createRoute } from '@hono/zod-openapi'
+import { createRoute, OpenAPIHono } from '@hono/zod-openapi'
 import { bodyLimit } from 'hono/body-limit'
 
-import type { ContactMessage } from '#/contact/domain/ContactMessage.ts'
 import { negotiateFormat, requireJsonContentType } from '#/shared/http/contentNegotiation.ts'
 import { DeserializationError, PayloadTooLargeError } from '#/shared/http/httpErrors.ts'
 import {
@@ -9,7 +8,6 @@ import {
   errorSchema,
   problemContent,
 } from '#/shared/http/problemSchemas.ts'
-import type { RouteOptions } from '#/shared/http/routeOptions.ts'
 import { scenario } from '#/shared/http/scenario.ts'
 
 import { ContactMessageValidationError } from './ContactMessageValidationError.ts'
@@ -20,8 +18,11 @@ import {
   toDraft,
   violationsFromIssues,
 } from './contract.ts'
-import type { ContactMessageOutput } from './contract.ts'
 import { deserializeContactMessage } from './deserializeContactMessage.ts'
+
+import type { ContactMessageOutput } from './contract.ts'
+import type { ContactMessage } from '#/contact/domain/ContactMessage.ts'
+import type { RouteOptions } from '#/shared/http/routeOptions.ts'
 
 /** Large au-dessus du plus gros corps valide (5000 caractères de message, 4 octets au plus chacun). */
 const MAX_BODY_KILOBYTES = 64

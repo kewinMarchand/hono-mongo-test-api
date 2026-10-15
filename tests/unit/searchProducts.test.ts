@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { searchProducts } from '#/catalog/application/searchProducts.ts'
-import type { Catalog } from '#/catalog/domain/catalog.ts'
 import { CategoryNotFoundError } from '#/catalog/domain/CategoryNotFoundError.ts'
 import { parseCriteria } from '#/catalog/domain/productCriteria.ts'
-import { rawCriteriaFromQuery } from '#/catalog/http/productQuery.ts'
+import { searchProducts } from '#/catalog/application/searchProducts.ts'
 import { categoryFixtures, productFixtures } from '#/catalog/infrastructure/catalogFixtures.ts'
+import { rawCriteriaFromQuery } from '#/catalog/http/productQuery.ts'
+
+import type { Catalog } from '#/catalog/domain/catalog.ts'
 
 const repositories = () => {
   const queries: Catalog.SearchQuery[] = []

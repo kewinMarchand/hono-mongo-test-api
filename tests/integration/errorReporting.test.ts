@@ -1,11 +1,14 @@
 import * as Sentry from '@sentry/node'
-import type { NodeOptions } from '@sentry/node'
 import { describe, expect, it } from 'vitest'
 
-import { createApp } from '#/app.ts'
-import type { AppDependencies } from '#/app.ts'
-import { categoryFixtures } from '#/catalog/infrastructure/catalogFixtures.ts'
 import { initErrorReporting } from '#/shared/infrastructure/errorReporting.ts'
+
+import { categoryFixtures } from '#/catalog/infrastructure/catalogFixtures.ts'
+
+import { createApp } from '#/app.ts'
+
+import type { NodeOptions } from '@sentry/node'
+import type { AppDependencies } from '#/app.ts'
 
 /** DSN factice : l'envoi réseau est remplacé, aucune instance GlitchTip n'est contactée. */
 const FAKE_DSN = 'http://cle@glitchtip.test/1'
